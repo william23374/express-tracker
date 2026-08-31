@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from express.config import (
+    CONFIG_PATH,
     AppConfig,
     DEFAULT_PROVIDER_CHAIN,
     load_config,
@@ -131,12 +132,12 @@ class TrackingService:
         if name == "huawei_jm" and not self.config.has_huawei_jm_credentials():
             raise ProviderError(
                 "Provider 'huawei_jm' needs AppKey + AppSecret. "
-                "Configure [huawei_jm] in ~/.express/config.toml, or use 'auto'."
+                f"Configure [huawei_jm] in {CONFIG_PATH}, or use 'auto'."
             )
         if name == "huawei_kd100" and not self.config.has_kd100_credentials():
             raise ProviderError(
                 "Provider 'huawei_kd100' needs AppKey + AppSecret. "
-                "Configure [huawei_kd100] in ~/.express/config.toml, or use 'auto'."
+                f"Configure [huawei_kd100] in {CONFIG_PATH}, or use 'auto'."
             )
         self.provider = self._build_single(self.config, name)
         self.config.default_provider = name
