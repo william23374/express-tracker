@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Run from scripts/: ./uninstall
+exec "$(cd "$(dirname "$0")" && pwd)/uninstall.sh" "$@"

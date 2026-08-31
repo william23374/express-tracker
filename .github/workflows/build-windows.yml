@@ -1,0 +1,32 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:            # manual trigger from the Actions page
+  push:
+    tags: ["v*"]                # or push a tag like v1.0.0
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps + build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pyinstaller pyreadline3
+
+      - name: Build onefile EXE
+        run: pyinstaller --noconfirm --clean windows/El.spec
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Express-windows-exe
+          path: dist/Express.exe
