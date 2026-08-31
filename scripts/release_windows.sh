@@ -159,8 +159,8 @@ step_wait() {
   for i in $(seq 1 "${POLL_TIMEOUT}"); do
     s="$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" \
       "${GH_API}/repos/${REPO}/actions/runs/${RUN_ID}" || true)"
-    status="$(printf '%s' "${s}" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("status","") if sys.stdin.read() else "")' 2>/dev/null || true)"
-    concl="$(printf '%s' "${s}" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("conclusion","") if sys.stdin.read() else "")' 2>/dev/null || true)"
+    status="$(printf '%s' "${s}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get("status",""))' 2>/dev/null || true)"
+    concl="$(printf '%s' "${s}" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d.get("conclusion",""))' 2>/dev/null || true)"
     printf '\r  [%02d] status=%s conclusion=%s   ' "${i}" "${status}" "${concl}"
     if [ "${status}" = "completed" ]; then printf '\n'; break; fi
     sleep "${POLL_INTERVAL}"
