@@ -113,6 +113,14 @@ _owner_repo2() {
 step_push() {
   info "1/4 提交并推送当前代码 ..."
   local msg="${1:-release: build Windows EXE $(date '+%Y-%m-%d_%H:%M:%S')}"
+
+  # 幂等：本地无改动且 HEAD 已与 origin 同步时，跳过 git 推送，直接构建
+  if [ -z "$(git -C "${ROOT_DIR}" status --porcelain)" ] \
+     && [ "$(git -C "${ROOT_DIR}" rev-parse HEAD)" = "$(git -C "${ROOT_DIR}" rev-parse origin/main 2>/dev/null || echo none)" ]; then
+    ok "无本地改动，已与 origin/main 同步，跳过推送"
+    return 0
+  fi
+
   bash "${GITSH_SCRIPT}" push "${msg}" || die "git 推送失败，请检查 gitsh.sh 输出"
   ok "提交并推送完成"
 }
