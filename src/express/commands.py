@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 from typing import Optional
 
 from express.config import (
@@ -25,7 +27,40 @@ def is_mock(svc: TrackingService) -> bool:
     return svc.provider_name == "mock"
 
 
-def cmd_list(svc: TrackingService) -> None:
+def _refresh_all(svc: TrackingService) -> None:
+    """Re-fetch status for every saved shipment and store the latest snapshot."""
+    rows = svc.list()
+    if not rows:
+        console.print("[dim]nothing to refresh — no saved shipments[/dim]")
+        return
+    ok = cached = 0
+    failed: list[str] = []
+    for idx, s in enumerate(rows):
+        try:
+            result = svc.get(str(s.id))
+            if result.status_code == "cached":
+                cached += 1
+            else:
+                ok += 1
+        except ProviderError as exc:
+            failed.append(f"{s.tracking_number}: {exc}")
+        if idx < len(rows) - 1:
+            time.sleep(0.3)  # respect provider rate limits
+    parts = [f"[green]{ok} ok[/green]"]
+    if cached:
+        parts.append(f"[yellow]{cached} cached[/yellow]")
+    if failed:
+        parts.append(f"[red]{len(failed)} failed[/red]")
+    console.print(
+        f"[bold]refreshed {len(rows)}[/bold] shipment(s): " + " / ".join(parts)
+    )
+    for f in failed:
+        console.print(f"[dim]  {f}[/dim]")
+
+
+def cmd_list(svc: TrackingService, refresh: bool = False) -> None:
+    if refresh:
+        _refresh_all(svc)
     print_list(svc.list(), svc.provider_name)
 
 
@@ -211,6 +246,9 @@ def cmd_config(*, init: bool = False) -> None:
     console.print(
         f"huawei_kd100 creds: {'yes (AppKey+AppSecret)' if cfg.has_kd100_credentials() else 'no (Huawei Cloud 快递100实时/百递云)'}"
     )
+    console.print(
+        f"ali_kd100 creds: {'yes (AppCode)' if cfg.has_ali_kd100_credentials() else 'no (Aliyun Cloud Marketplace 快递100实时/百递云)'}"
+    )
     chain = cfg.provider_chain or DEFAULT_PROVIDER_CHAIN
     console.print(
         f"fallback chain (auto): {', '.join(chain)}"
@@ -229,6 +267,7 @@ def cmd_providers(svc: TrackingService) -> None:
         "alapi": "free tier token; kd may need membership",
         "huawei_jm": "Huawei Cloud API 快递查询【最新版】(聚美/安那其); AppKey+AppSecret",
         "huawei_kd100": "Huawei Cloud API 快递100实时 (百递云); AppKey+AppSecret",
+        "ali_kd100": "Aliyun Cloud API 快递100实时 (百递云); AppCode",
     }
     real = [n for n in available_providers() if n not in ("auto", "fallback", "mock")]
 
@@ -241,6 +280,8 @@ def cmd_providers(svc: TrackingService) -> None:
             return cfg.has_huawei_jm_credentials()
         if name == "huawei_kd100":
             return cfg.has_kd100_credentials()
+        if name == "ali_kd100":
+            return cfg.has_ali_kd100_credentials()
         return True
 
     def status(name: str) -> str:
@@ -326,7 +367,7 @@ def print_help() -> None:
     table.add_column("Description")
 
     rows = [
-        ("LIST", "li, ls", "List saved tracking numbers"),
+        (r"LIST \[/R]", "li, ls", "List saved tracking numbers (/R refreshes all)"),
         (r"SAVE:NUMBER\[/C]\[/P]\[/N]", "", "Save a new tracking number (info only, no live query)"),
         (r"TRACK:NUMBER\[/C]\[/P]", "tr", "Live-track a shipment (updates saved history)"),
         (r"QUERY:NUMBER\[/C]\[/P]\[/H]", "", "Live fetch latest status (saved phone reused)"),
@@ -353,6 +394,7 @@ def print_help() -> None:
     opts.add_row("N", "Note / label; N= empty to clear")
     opts.add_row("T", "New tracking number (MODIFY)")
     opts.add_row("H", "Show full history (QUERY)")
+    opts.add_row("R", "Refresh all saved shipments' latest status (LIST)")
     opts.add_row("/INIT", "Create example ~/.express/config.toml (CONF)")
 
     console.print()
@@ -431,6 +473,12 @@ def parse_eterm_params(param_str: str) -> dict:
     return out
 
 
+def has_eterm_flag(param_str: str, flag: str) -> bool:
+    """Return True if the payload contains a bare flag segment like '/R'."""
+    flag = flag.upper()
+    return any(seg.strip().upper() == flag for seg in param_str.split("/"))
+
+
 def dispatch(svc: TrackingService, line: str) -> bool:
     """
     Run one ETerm-style command line. Returns False if the shell should exit.
@@ -456,7 +504,7 @@ def dispatch(svc: TrackingService, line: str) -> bool:
         print_help()
         return True
     if cmd in ("LIST", "LI", "LS"):
-        cmd_list(svc)
+        cmd_list(svc, refresh=has_eterm_flag(rest, "R"))
         return True
     if cmd in ("VER", "VERSION", "-V", "--VERSION"):
         cmd_version()

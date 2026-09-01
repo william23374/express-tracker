@@ -49,6 +49,7 @@ def create_provider(name: str, **kwargs) -> TrackingProvider:
 
 def load_builtin_providers() -> None:
     from express.providers import alapi as _alapi  # noqa: F401
+    from express.providers import ali_kd100 as _ali_kd100  # noqa: F401
     from express.providers import apizero as _apizero  # noqa: F401
     from express.providers import fallback as _fallback  # noqa: F401
     from express.providers import huawei_jm as _huawei_jm  # noqa: F401

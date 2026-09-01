@@ -104,6 +104,7 @@ def print_list(rows, provider_name: str) -> None:
     table.add_column("Courier")
     table.add_column("Phone")
     table.add_column("Status")
+    table.add_column("Location")
     table.add_column("Note")
     for s in rows:
         raw_status = s.last_status or ""
@@ -121,12 +122,14 @@ def print_list(rows, provider_name: str) -> None:
         status_label = to_en_status(raw_status) if raw_status else "-"
         status = Text(status_label, style=status_style(raw_status))
         phone_label = f"***{s.phone[-4:]}" if s.phone else "-"
+        loc_label = extract_location(s.last_location) or s.last_location or "-"
         table.add_row(
             str(s.id),
             s.tracking_number,
             s.company_name or s.company_code or "-",
             phone_label,
             status,
+            loc_label,
             s.note or "",
         )
     console.print(table)

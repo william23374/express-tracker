@@ -29,6 +29,7 @@ a = Analysis(
         "express.providers.fallback",
         "express.providers.huawei_jm",
         "express.providers.huawei_kd100",
+        "express.providers.ali_kd100",
         "express.providers.mock",
         "express.providers._guess",
         "express.providers._common",

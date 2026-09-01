@@ -66,6 +66,13 @@ class TrackingService:
                 app_key=config.kd100_appkey,
                 app_secret=config.kd100_appsecret,
             )
+        if name == "ali_kd100":
+            if not config.has_ali_kd100_credentials():
+                return None
+            return create_provider(
+                "ali_kd100",
+                app_code=config.ali_kd100_appcode,
+            )
         if name in available_providers():
             # Any registered provider can join the chain.
             return create_provider(name)
@@ -111,6 +118,13 @@ class TrackingService:
                 app_key=config.kd100_appkey,
                 app_secret=config.kd100_appsecret,
             )
+        if name == "ali_kd100":
+            if not config.has_ali_kd100_credentials():
+                return create_provider("mock")
+            return create_provider(
+                "ali_kd100",
+                app_code=config.ali_kd100_appcode,
+            )
         if name in available_providers():
             return create_provider(name)
         raise ProviderError(
@@ -138,6 +152,11 @@ class TrackingService:
             raise ProviderError(
                 "Provider 'huawei_kd100' needs AppKey + AppSecret. "
                 f"Configure [huawei_kd100] in {CONFIG_PATH}, or use 'auto'."
+            )
+        if name == "ali_kd100" and not self.config.has_ali_kd100_credentials():
+            raise ProviderError(
+                "Provider 'ali_kd100' needs an Aliyun Cloud Marketplace AppCode. "
+                f"Configure [ali_kd100] in {CONFIG_PATH}, or use 'auto'."
             )
         self.provider = self._build_single(self.config, name)
         self.config.default_provider = name

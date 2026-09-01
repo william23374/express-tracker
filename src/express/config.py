@@ -31,6 +31,7 @@ class AppConfig:
     huawei_jm_appsecret: str = ""
     kd100_appkey: str = ""
     kd100_appsecret: str = ""
+    ali_kd100_appcode: str = ""
     provider_chain: list[str] = field(default_factory=list)
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -45,6 +46,9 @@ class AppConfig:
 
     def has_kd100_credentials(self) -> bool:
         return bool(self.kd100_appkey and self.kd100_appsecret)
+
+    def has_ali_kd100_credentials(self) -> bool:
+        return bool(self.ali_kd100_appcode)
 
 
 def ensure_config_dir() -> Path:
@@ -122,6 +126,15 @@ def load_config() -> AppConfig:
         or str(kd100.get("app_secret", "") or "")
     ).strip()
 
+    ali_kd100 = data.get("ali_kd100") or {}
+    if not isinstance(ali_kd100, dict):
+        ali_kd100 = {}
+    ali_kd100_appcode = (
+        os.environ.get("EXPRESS_ALI_KD100_APPCODE")
+        or os.environ.get("EL_ALI_KD100_APPCODE")
+        or str(ali_kd100.get("app_code", "") or "")
+    ).strip()
+
     chain: list[str] = []
     raw_chain = data.get("provider_chain") or []
     if isinstance(raw_chain, str):
@@ -144,6 +157,7 @@ def load_config() -> AppConfig:
         huawei_jm_appsecret=huawei_jm_appsecret,
         kd100_appkey=kd100_appkey,
         kd100_appsecret=kd100_appsecret,
+        ali_kd100_appcode=ali_kd100_appcode,
         provider_chain=chain,
         extra={
             k: v
@@ -156,6 +170,7 @@ def load_config() -> AppConfig:
                 "alapi",
                 "huawei_jm",
                 "huawei_kd100",
+                "ali_kd100",
             )
         },
     )
@@ -196,6 +211,12 @@ app_secret = ""
 #   marketplace.huaweicloud.com/contents/af4f963a-0894-4aa3-860d-acab425267e7
 app_key = ""
 app_secret = ""
+
+[ali_kd100]
+# 快递100/百递云 via Aliyun Cloud Marketplace (AppCode simple auth).
+# Product: 快递物流轨迹查询单号识别时效预估服务 (cmapi00053347)
+#   market.aliyun.com/detail/cmapi00053347
+app_code = ""
 """,
         encoding="utf-8",
     )

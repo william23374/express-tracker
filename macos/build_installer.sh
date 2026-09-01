@@ -191,6 +191,11 @@ EOF
 sign_app "${APP}"
 "${RES}/express/express" config >/dev/null || true
 
+# Portable direct-open desktop app (unzip -> double-click Express.app)
+ZIP="${DIST}/Express-macos.zip"
+rm -f "${ZIP}"
+ditto -c -k --keepParent "${APP}" "${ZIP}"
+
 STAGE="${DIST}/_dmg_stage"
 DMG="${DIST}/Express-Installer.dmg"
 rm -rf "${STAGE}"; mkdir -p "${STAGE}"
@@ -220,6 +225,7 @@ echo ""
 echo "Ready:"
 echo "  version  ${FULL_VERSION}"
 echo "  app      ${APP}"
+echo "  zip      ${ZIP}"
 echo "  dmg      ${DMG}"
 echo "  open     ${HOME}/Applications/${APP_NAME}.app"
 

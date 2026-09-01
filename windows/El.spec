@@ -17,7 +17,7 @@ a = Analysis(
         "express.providers", "express.providers.base", "express.providers.apizero",
         "express.providers.alapi", "express.providers.fallback",
         "express.providers.huawei_jm", "express.providers.huawei_kd100",
-        "express.providers.mock", "express.providers._guess", "express.providers._common",
+        "express.providers.ali_kd100", "express.providers.mock", "express.providers._guess", "express.providers._common",
         "httpx", "anyio", "certifi",
         "rich", "rich.console", "rich.table", "rich.panel", "rich.text",
         "pyreadline3",

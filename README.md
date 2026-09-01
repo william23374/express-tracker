@@ -74,6 +74,11 @@ app_secret = "YOUR_APPSECRET"
 [huawei_kd100]
 app_key = "YOUR_APPKEY"
 app_secret = "YOUR_APPSECRET"
+
+# 快递100/百递云 via Aliyun Cloud Marketplace (AppCode simple auth)
+# product: market.aliyun.com/detail/cmapi00053347 (快递物流轨迹查询单号识别时效预估服务)
+[ali_kd100]
+app_code = "YOUR_ALIYUN_APPCODE"
 ```
 
 `auto` tries providers in `provider_chain` order and switches to the next
@@ -98,6 +103,9 @@ Free providers (daily quota):
   separate AppKey+AppSecret (`[huawei_kd100]`). Uses kuaidi100 `com` codes
   (shunfeng/zhongtong/yuantong/jtexpress/...) and `com=auto` auto-detects; SF/丰网
   want the receiver-or-sender phone last-4.
+- `ali_kd100` — 快递100/百递云 via Aliyun Cloud Marketplace (paid, per-call);
+  needs an AppCode (`[ali_kd100] app_code`). Same kuaidi100 `com` codes and
+  `com=auto`; SF/中通 want the receiver-or-sender phone last-4.
 
 ## Shell commands
 
