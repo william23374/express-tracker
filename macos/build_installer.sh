@@ -125,6 +125,12 @@ PY="${BUILD_VENV}/bin/python"
 
 bash "${ROOT}/macos/build_icon.sh"
 
+# Bake the build number into the app so `ver` reports v1.0.0+build$BUILD_NO.
+# The file is gitignored and removed again at the end of the script.
+cat > "${ROOT}/src/express/_build.py" <<EOF
+BUILD_NO = "${BUILD_NO}"
+EOF
+
 echo "==> PyInstaller → express (console REPL)"
 rm -rf "${DIST}/express" "${DIST}/${APP_NAME}.app" "${DIST}/El.app" "${BUILD}"
 cd "${ROOT}"
@@ -214,6 +220,7 @@ rm -f "${DMG}"
 hdiutil create -volname "Express ${FULL_VERSION}" -srcfolder "${STAGE}" -ov -format UDZO "${DMG}" >/dev/null
 notarize "${DMG}" "${APP}"
 rm -rf "${STAGE}" "${BUILD}" "${DIST}/express"
+rm -f "${ROOT}/src/express/_build.py"
 
 mkdir -p "${HOME}/Applications"
 rm -rf "${HOME}/Applications/${APP_NAME}.app" "${HOME}/Applications/El.app"

@@ -11,7 +11,7 @@ except ImportError:  # Windows: no stdlib readline
         _readline = None
 from pathlib import Path
 
-from express import __version__
+from express import __version_full__
 from express.commands import dispatch
 from express.display import console
 from express.providers.base import ProviderError
@@ -51,7 +51,7 @@ def run_repl() -> None:
     svc = TrackingService()
     _load_readline_history()
     console.print(
-        f"[bold]Express[/bold] tracker v{__version__}  "
+        f"[bold]Express[/bold] tracker v{__version_full__}  "
         f"[dim](provider={svc.provider_name})[/dim]"
     )
     console.print("[dim]Type HELP — commands need no prefix. SO to quit.[/dim]")

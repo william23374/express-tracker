@@ -13,7 +13,7 @@ from express.config import (
     load_config,
     write_example_config,
 )
-from express import __version__
+from express import __version_full__
 from express.display import console, print_current, print_history, print_list
 from express.providers.base import ProviderError, available_providers, load_builtin_providers
 from express.service import TrackingService
@@ -326,7 +326,7 @@ def cmd_use_provider(svc: TrackingService, name: str) -> None:
 
 def cmd_version() -> None:
     """Show the installed Express version."""
-    console.print(f"[bold]Express[/bold] tracker v{__version__}")
+    console.print(f"[bold]Express[/bold] tracker v{__version_full__}")
 
 
 def print_help() -> None:
