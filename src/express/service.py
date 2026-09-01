@@ -22,7 +22,6 @@ from express.storage import SQLiteStore, merge_events
 from express.validation import (
     is_phone_related_error,
     phone_query_hint,
-    require_phone_for_courier,
     validate_tracking_number,
 )
 
@@ -44,12 +43,6 @@ class TrackingService:
         config: AppConfig, name: str
     ) -> Optional[TrackingProvider]:
         """Build one provider for the fallback chain; None = skip."""
-        if name == "apizero":
-            return create_provider("apizero", key=config.apizero_key)
-        if name == "alapi":
-            if not config.has_alapi_credentials():
-                return None
-            return create_provider("alapi", key=config.alapi_key)
         if name == "huawei_jm":
             if not config.has_huawei_jm_credentials():
                 return None
@@ -96,12 +89,6 @@ class TrackingService:
             if not providers:
                 return create_provider("mock")
             return create_provider("fallback", providers=providers)
-        if name == "apizero":
-            return create_provider("apizero", key=config.apizero_key)
-        if name == "alapi":
-            if not config.has_alapi_credentials():
-                return create_provider("mock")
-            return create_provider("alapi", key=config.alapi_key)
         if name == "huawei_jm":
             if not config.has_huawei_jm_credentials():
                 return create_provider("mock")
@@ -139,10 +126,6 @@ class TrackingService:
                 f"Unknown provider '{name}'. Available: {', '.join(available_providers())} or 'auto'"
             )
         # Guard cred-requiring providers so the user isn't silently switched to mock
-        if name == "alapi" and not self.config.has_alapi_credentials():
-            raise ProviderError(
-                f"Provider 'alapi' needs a token. Configure [alapi] key, or use 'auto'."
-            )
         if name == "huawei_jm" and not self.config.has_huawei_jm_credentials():
             raise ProviderError(
                 "Provider 'huawei_jm' needs AppKey + AppSecret. "
@@ -203,9 +186,6 @@ class TrackingService:
 
         existing = self.store.get_by_number(tracking_number)
         effective_phone = stored_phone or (existing.phone if existing else "")
-        if track and self.provider_name == "apizero":
-            require_phone_for_courier(company_code, effective_phone)
-
         if existing:
             updated = self.store.update_meta(
                 existing.id,

@@ -25,7 +25,7 @@ src/express/
   storage.py
   validation.py
   status.py
-  providers/       # auto/fallback | alapi | apizero | huawei_jm | huawei_kd100 | mock
+  providers/       # auto/fallback | huawei_jm | huawei_kd100 | ali_kd100 | mock
 ```
 
 ## Install
@@ -58,10 +58,7 @@ open dist/Express-Installer.dmg
 
 ```toml
 default_provider = "auto"
-provider_chain = ["apizero", "alapi"]
-
-[alapi]
-key = "YOUR_ALAPI_TOKEN"
+provider_chain = ["huawei_kd100", "ali_kd100", "huawei_jm"]
 
 # Huawei Cloud marketplace 快递查询【最新版】 (聚美智数/杭州安那其) — AppKey/AppSecret
 # (purchase at marketplace.huaweicloud.com, Resource Detail -> APIG gateway)
@@ -89,13 +86,11 @@ To switch the live provider (persists to config), use the shell:
 
 ```text
 express > PROV                 # list all providers + configured status
-express > USE:alapi            # switch to a specific provider
+express > USE:huawei_kd100      # switch to a specific provider
 express > USE:auto             # back to auto-select (fallback chain)
 ```
 
-Free providers (daily quota):
-- `apizero` — 30/day anonymous, 100/day with key (apizero.cn)
-- `alapi` — free tier (token from alapi.cn; kd interface may need membership)
+Providers (all are cloud-marketplace APIs; each needs its own credential):
 - `huawei_jm` — Huawei Cloud marketplace API 快递查询【最新版】(聚美/安那其; paid, per-call); needs AppKey+AppSecret.
   Courier codes are UPPERCASE (SF/ZTO/YTO/YD/STO/JD/EMS/JT); ZTO/SF want the FULL
   receiver phone (not just the last-4).

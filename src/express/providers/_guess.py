@@ -1,6 +1,6 @@
 """Local heuristics for courier detection — no external API required.
 
-Shared by providers that lack a dedicated auto-detect endpoint (apizero, alapi).
+Shared by providers that lack a dedicated auto-detect endpoint.
 Returns juhe-style internal company codes.
 """
 

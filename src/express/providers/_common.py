@@ -12,7 +12,7 @@ from typing import Sequence
 
 from express.models import TrackingEvent
 
-# Format superset covering apizero / alapi.
+# Format superset covering several providers.
 DEFAULT_TIME_FORMATS: tuple[str, ...] = (
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",

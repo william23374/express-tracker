@@ -18,15 +18,14 @@ LEGACY_DIR = Path.home() / ".el"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
 DB_PATH = CONFIG_DIR / "shipments.db"
 
-# Order used by default_provider = "auto": stable free API first.
-DEFAULT_PROVIDER_CHAIN = ["apizero", "alapi"]
+# Order used by default_provider = "auto": providers without credentials are
+# skipped automatically, so paid providers can be listed safely.
+DEFAULT_PROVIDER_CHAIN = ["huawei_kd100", "ali_kd100", "huawei_jm"]
 
 
 @dataclass
 class AppConfig:
     default_provider: str = "auto"
-    apizero_key: str = ""
-    alapi_key: str = ""
     huawei_jm_appkey: str = ""
     huawei_jm_appsecret: str = ""
     kd100_appkey: str = ""
@@ -34,12 +33,6 @@ class AppConfig:
     ali_kd100_appcode: str = ""
     provider_chain: list[str] = field(default_factory=list)
     extra: dict[str, Any] = field(default_factory=dict)
-
-    def has_apizero_credentials(self) -> bool:
-        return bool(self.apizero_key)
-
-    def has_alapi_credentials(self) -> bool:
-        return bool(self.alapi_key)
 
     def has_huawei_jm_credentials(self) -> bool:
         return bool(self.huawei_jm_appkey and self.huawei_jm_appsecret)
@@ -80,23 +73,6 @@ def load_config() -> AppConfig:
     ensure_config_dir()
     data = _load_toml(CONFIG_PATH)
     provider = str(data.get("default_provider", "auto"))
-
-    az = data.get("apizero") or {}
-    if not isinstance(az, dict):
-        az = {}
-    al = data.get("alapi") or {}
-    if not isinstance(al, dict):
-        al = {}
-
-    apizero_key = (
-        os.environ.get("EXPRESS_APIZERO_KEY")
-        or str(az.get("key", "") or "")
-    ).strip()
-    alapi_key = (
-        os.environ.get("EXPRESS_ALAPI_TOKEN")
-        or os.environ.get("EL_ALAPI_TOKEN")
-        or str(al.get("key", "") or "")
-    ).strip()
 
     hw = data.get("huawei_jm") or {}
     if not isinstance(hw, dict):
@@ -151,8 +127,6 @@ def load_config() -> AppConfig:
 
     return AppConfig(
         default_provider=provider,
-        apizero_key=apizero_key,
-        alapi_key=alapi_key,
         huawei_jm_appkey=huawei_jm_appkey,
         huawei_jm_appsecret=huawei_jm_appsecret,
         kd100_appkey=kd100_appkey,
@@ -166,8 +140,6 @@ def load_config() -> AppConfig:
             not in (
                 "default_provider",
                 "provider_chain",
-                "apizero",
-                "alapi",
                 "huawei_jm",
                 "huawei_kd100",
                 "ali_kd100",
@@ -183,21 +155,13 @@ def write_example_config(path: Path | None = None) -> Path:
         return target
     target.write_text(
         """# express tracker config
-# default_provider: auto | apizero | alapi | mock
+# default_provider: auto | huawei_jm | huawei_kd100 | ali_kd100 | mock
 # auto = try providers in order until one succeeds (see provider_chain)
-# apizero = free real data (30/day no key, 100/day with key from apizero.cn)
-# alapi = free tier (token from alapi.cn; kd interface may need membership)
+# providers without credentials are skipped automatically.
 default_provider = "auto"
 
 # Order for auto fallback; providers without credentials are skipped.
-# Stable free API first.
-provider_chain = ["apizero", "alapi"]
-
-[apizero]
-key = ""
-
-[alapi]
-key = ""
+provider_chain = ["huawei_kd100", "ali_kd100", "huawei_jm"]
 
 [huawei_jm]
 # Huawei Cloud marketplace 快递查询【最新版】 (聚美智数/杭州安那其; APP signature)

@@ -235,12 +235,6 @@ def cmd_config(*, init: bool = False) -> None:
     console.print(f"provider {cfg.default_provider}")
     console.print(f"providers available: {', '.join(available_providers())}")
     console.print(
-        f"apizero key: {'yes (100/day)' if cfg.has_apizero_credentials() else 'no (30/day anonymous)'}"
-    )
-    console.print(
-        f"alapi token: {'yes' if cfg.has_alapi_credentials() else 'no (free at alapi.cn)'}"
-    )
-    console.print(
         f"huawei_jm creds: {'yes (AppKey+AppSecret)' if cfg.has_huawei_jm_credentials() else 'no (Huawei Cloud 快递查询【最新版】/聚美)'}"
     )
     console.print(
@@ -263,8 +257,6 @@ def cmd_providers(svc: TrackingService) -> None:
 
     # Real, user-selectable API providers only (drop auto/fallback mode + mock).
     desc = {
-        "apizero": "free: 30/day anonymous, 100/day with key",
-        "alapi": "free tier token; kd may need membership",
         "huawei_jm": "Huawei Cloud API 快递查询【最新版】(聚美/安那其); AppKey+AppSecret",
         "huawei_kd100": "Huawei Cloud API 快递100实时 (百递云); AppKey+AppSecret",
         "ali_kd100": "Aliyun Cloud API 快递100实时 (百递云); AppCode",
@@ -272,10 +264,6 @@ def cmd_providers(svc: TrackingService) -> None:
     real = [n for n in available_providers() if n not in ("auto", "fallback", "mock")]
 
     def configured(name: str) -> bool:
-        if name == "apizero":
-            return True
-        if name == "alapi":
-            return cfg.has_alapi_credentials()
         if name == "huawei_jm":
             return cfg.has_huawei_jm_credentials()
         if name == "huawei_kd100":

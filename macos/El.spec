@@ -24,8 +24,6 @@ a = Analysis(
         "express.validation",
         "express.providers",
         "express.providers.base",
-        "express.providers.apizero",
-        "express.providers.alapi",
         "express.providers.fallback",
         "express.providers.huawei_jm",
         "express.providers.huawei_kd100",
