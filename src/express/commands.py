@@ -235,13 +235,13 @@ def cmd_config(*, init: bool = False) -> None:
     console.print(f"provider {cfg.default_provider}")
     console.print(f"providers available: {', '.join(available_providers())}")
     console.print(
-        f"huawei_jm creds: {'yes (AppKey+AppSecret)' if cfg.has_huawei_jm_credentials() else 'no (Huawei Cloud 快递查询【最新版】/聚美)'}"
+        f"huawei_jm creds: {'yes (AppKey+AppSecret)' if cfg.has_huawei_jm_credentials() else 'no (Huawei Cloud courier-query (latest) / Jumei)'}"
     )
     console.print(
-        f"huawei_kd100 creds: {'yes (AppKey+AppSecret)' if cfg.has_kd100_credentials() else 'no (Huawei Cloud 快递100实时/百递云)'}"
+        f"huawei_kd100 creds: {'yes (AppKey+AppSecret)' if cfg.has_kd100_credentials() else 'no (Huawei Cloud Kuaidi100 realtime / Baidiyun)'}"
     )
     console.print(
-        f"ali_kd100 creds: {'yes (AppCode)' if cfg.has_ali_kd100_credentials() else 'no (Aliyun Cloud Marketplace 快递100实时/百递云)'}"
+        f"ali_kd100 creds: {'yes (AppCode)' if cfg.has_ali_kd100_credentials() else 'no (Aliyun Cloud Marketplace Kuaidi100 realtime / Baidiyun)'}"
     )
     chain = cfg.provider_chain or DEFAULT_PROVIDER_CHAIN
     console.print(
@@ -257,9 +257,9 @@ def cmd_providers(svc: TrackingService) -> None:
 
     # Real, user-selectable API providers only (drop auto/fallback mode + mock).
     desc = {
-        "huawei_jm": "Huawei Cloud API 快递查询【最新版】(聚美/安那其); AppKey+AppSecret",
-        "huawei_kd100": "Huawei Cloud API 快递100实时 (百递云); AppKey+AppSecret",
-        "ali_kd100": "Aliyun Cloud API 快递100实时 (百递云); AppCode",
+        "huawei_jm": "Huawei Cloud API courier query (latest) (Jumei/Anaqi); AppKey+AppSecret",
+        "huawei_kd100": "Huawei Cloud API Kuaidi100 realtime (Baidiyun); AppKey+AppSecret",
+        "ali_kd100": "Aliyun Cloud API Kuaidi100 realtime (Baidiyun); AppCode",
     }
     real = [n for n in available_providers() if n not in ("auto", "fallback", "mock")]
 
